@@ -50,6 +50,104 @@ html.dark {
   }
 }
 
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* Ensures vertical alignment */
+  justify-content: space-between;
+  gap: 50px;
+  max-width: 90%;
+  margin: auto;
+  height: 100vh;
+}
+
+.text-content {
+  flex: 1;
+  max-width: 45%;
+  text-align: left;
+  padding-left: 5%;
+}
+
+.text-content p {
+  margin: 0;
+}
+
+.text-content:hover {
+  color: var(--color-accent);
+}
+
+.image-content {
+  flex: 1;
+  max-width: 45%;
+  display: flex;
+  justify-content: center;
+}
+
+.image-content img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 8px;
+  filter: grayscale(100%);
+  transition: filter var(--transition-fast);
+}
+
+.image-content img:hover {
+  filter: grayscale(0%);
+}
+
+.projects {
+  max-width: 90%;  /* Match .container */
+  margin: auto;    /* Center alignment */
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align to the left like .container */
+}
+
+.projects-title {
+  width: 100%;
+  margin: auto;
+  padding-bottom: 10px;
+  text-align: left;
+  padding-left: 5%; /* Ensuring alignment with .text-content */
+}
+
+.project-highlights {
+  width: 90%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.project-highlights article {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.project-highlights article h2 {
+  font-size: var(--font-size-section-title);
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--color-accent);
+  text-align: left;
+}
+
+.project-highlights article img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.project-highlights article p {
+  text-align: left;
+}
+
+
 /* General Styles */
 body {
   background-color: var(--color-primary);
@@ -133,53 +231,6 @@ nav a:hover {
     text-decoration-color: var(--color-accent);
   }
   
-  .container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 50px;
-    max-width: 90%;
-    margin: auto;
-    height: 100vh;
-  }
-  
-/*Text*/
-  .text-content {
-    flex: 1;
-    max-width: 45%;
-    text-align: left;
-    padding-left: 5%;
-  }
-  
-  .text-content p {
-    margin: 0;
-  }
-  
-  .text-content:hover {
-    color: var(--color-accent);
-  }
-  
-/*Images*/
-  .image-content {
-    flex: 1;
-    max-width: 45%;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .image-content img {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
-    border-radius: 8px;
-    filter: grayscale(100%);
-    transition: filter var(--transition-fast);
-  }
-  
-  .image-content img:hover {
-    filter: grayscale(0%);
-  }
   
   /* Resume Page*/
   #resume-page {
@@ -319,6 +370,8 @@ nav a:hover {
 #contact-page form button:hover {
   background: var(--color-highlight, pink);
 }
+
+/*Projects Page*/
 
 /*Projects Page*/
 

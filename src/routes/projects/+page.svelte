@@ -1,3 +1,7 @@
+<script>
+    import projects from "$lib/projects.json";
+    import Project from "$lib/Project.svelte";
+  </script>
 <svelte:head>
   <title>ZVL: Projects</title>
 </svelte:head>
@@ -9,14 +13,13 @@
         <a href="..\contact\index.html">Contact</a>
         <a href="https://github.com/zoevosslee" target="_blank">GitHub</a>
     </nav> -->
-    <h1>Projects</h1>
+    <h1>{ projects.length } Projects</h1>
+
     <div class="projects">
-        <article>
-            <h2>Lorem ipsum dolor sit.</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure, illum. Velit doloremque iure, quidem corrupti at voluptatibus repudiandae odio sed nam, sapiente culpa ipsum esse doloribus odit aliquid molestiae minus.</p>
-        </article>
-        <article>
+        {#each projects as p}
+        <Project data={p} hLevel="3" />
+        {/each}
+        <!-- <article>
             <h2>Non, praesentium tempora. Quod!</h2>
             <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
             <p>Rem ad reiciendis sit, pariatur modi mollitia consectetur amet quas deleniti id non consequatur laudantium odio. Molestiae aliquid, tempore ut sunt corrupti, nulla explicabo alias incidunt sit mollitia veniam voluptatibus.</p>
@@ -70,6 +73,6 @@
             <h2>Nihil, impedit exercitationem? Consectetur?</h2>
             <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
             <p>Consequuntur veritatis voluptatum beatae nesciunt at tempora a distinctio nihil esse alias officiis assumenda totam minus, voluptatem qui doloremque temporibus molestias! Tempore doloribus dolorem reprehenderit quas adipisci magni quis nihil.</p>
-        </article>
+        </article> -->
     </div>
     </div>
