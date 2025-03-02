@@ -24,10 +24,10 @@ function $$ (selector, context = document) {
 // step 3.1
 // step 3.1
 let pages = [
-	{url: "", title: "Home"},
-	{url: "projects/", title: "Projects"},
-    {url: "experience/", title: "Experience"},
-    {url: "contact/", title: "Contact"},
+	{url: "./", title: "Home"},
+	{url: "projects", title: "Projects"},
+    {url: "experience", title: "Experience"},
+    {url: "contact", title: "Contact"},
 ];
 
 
