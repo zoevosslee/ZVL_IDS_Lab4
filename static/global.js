@@ -32,10 +32,10 @@ function $$ (selector, context = document) {
 ]; */
 
 let pages = [
-    {url: `.`, title: "Home"},
-    {url: `projects`, title: "Projects"},
-    {url: `experience`, title: "Experience"},
-    {url: `contact`, title: "Contact"},
+    {url: ".", title: "Home"},
+    {url: "/projects", title: "Projects"},
+    {url: "/experience", title: "Experience"},
+    {url: "/contact", title: "Contact"},
 ];
 
 let nav = document.createElement("nav");
@@ -47,20 +47,28 @@ document.body.prepend(nav);
 // step 3.2
 // TODO: Comment out the `for (let p of pages) {...}` loop you made in step 3.1 and uncomment the for loop below! I have helped you restructure the loop a bit in a way that may be confusing from the lab instructions
 
-for (let p of pages) {
+/*for (let p of pages) {
 	let url = p.url;
 	let title = p.title;
 
     // Create correct relative link and add it to nav  
-    /* if (!ARE_WE_HOME && !url.startsWith("http")) {
+     if (!ARE_WE_HOME && !url.startsWith("http")) {
         url = "../" + url;
-    } */
+    } 
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.textContent = title;*/
+
+for (let p of pages) {
+    let url = p.url;
+    let title = p.title;
 
     let a = document.createElement("a");
     a.href = url;
     a.textContent = title;
     
-    if (a.host === location.host && a.pathname === location.pathname) {
+  /*  if (a.host === location.host && a.pathname === location.pathname) {
         a.classList.add("current"); // FILL IN CLASS NAME
     }
 
@@ -68,7 +76,18 @@ for (let p of pages) {
         a.target = "_blank";
     }
 
+    nav.append(a);*/
+    if (location.pathname.endsWith(url) || (url === "" && location.pathname === "/")) {  
+        a.classList.add("current");
+    }
+
+    // Open external links in a new tab (not required, but best practice)
+    if (new URL(url, location.origin).origin !== location.origin) {
+        a.target = "_blank";
+    }
+
     nav.append(a);
+    
 }
 
 // STEP 4
