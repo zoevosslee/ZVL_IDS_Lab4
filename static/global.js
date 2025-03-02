@@ -23,12 +23,15 @@ function $$ (selector, context = document) {
 
 // step 3.1
 // step 3.1
+let BASE_URL = "/ZVL_IDS_Lab4";  // Change this to match your GitHub repo name
+
 let pages = [
-	{url: "./", title: "Home"},
-	{url: "./projects", title: "Projects"},
-    {url: "./experience", title: "Experience"},
-    {url: "./contact", title: "Contact"},
+    {url: `${BASE_URL}/`, title: "Home"},
+    {url: `${BASE_URL}/projects/`, title: "Projects"},
+    {url: `${BASE_URL}/experience/`, title: "Experience"},
+    {url: `${BASE_URL}/contact/`, title: "Contact"},
 ];
+
 
 
 let nav = document.createElement("nav");
