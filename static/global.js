@@ -31,13 +31,11 @@ function $$ (selector, context = document) {
     {url: "contact", title: "Contact"},
 ]; */
 
-const BASE_PATH = process.env.BASE_PATH || "/ZVL_IDS_Lab4"; // ✅ Ensure correct GitHub Pages repo path
-
 let pages = [
-    {url: `${BASE_PATH}/`, title: "Home"},
-    {url: `${BASE_PATH}/projects/`, title: "Projects"},
-    {url: `${BASE_PATH}/experience/`, title: "Experience"},
-    {url: `${BASE_PATH}/contact/`, title: "Contact"},
+    {url: `.`, title: "Home"},
+    {url: `projects`, title: "Projects"},
+    {url: `experience`, title: "Experience"},
+    {url: `contact`, title: "Contact"},
 ];
 
 let nav = document.createElement("nav");
