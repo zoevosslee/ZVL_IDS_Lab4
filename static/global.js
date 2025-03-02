@@ -24,13 +24,21 @@ function $$ (selector, context = document) {
 // step 3.1
 // step 3.1
 
-let pages = [
+/* let pages = [
 	{url: "./", title: "Home"},
 	{url: "projects", title: "Projects"},
     {url: "experience", title: "Experience"},
     {url: "contact", title: "Contact"},
-];
+]; */
 
+const BASE_PATH = process.env.BASE_PATH || ""; // Ensure it matches GitHub Pages setup
+
+let pages = [
+    {url: `${BASE_PATH}/`, title: "Home"},
+    {url: `${BASE_PATH}/projects/`, title: "Projects"},
+    {url: `${BASE_PATH}/experience/`, title: "Experience"},
+    {url: `${BASE_PATH}/contact/`, title: "Contact"},
+];
 
 let nav = document.createElement("nav");
 document.body.prepend(nav);
