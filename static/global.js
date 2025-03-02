@@ -31,7 +31,7 @@ function $$ (selector, context = document) {
     {url: "contact", title: "Contact"},
 ]; */
 
-const BASE_PATH = process.env.BASE_PATH || ""; // Ensure it matches GitHub Pages setup
+const BASE_PATH = process.env.BASE_PATH || "/ZVL_IDS_Lab4"; // ✅ Ensure correct GitHub Pages repo path
 
 let pages = [
     {url: `${BASE_PATH}/`, title: "Home"},
