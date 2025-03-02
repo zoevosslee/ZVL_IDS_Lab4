@@ -33,9 +33,9 @@ function $$ (selector, context = document) {
 
 let pages = [
     {url: ".", title: "Home"},
-    {url: "/projects", title: "Projects"},
-    {url: "/experience", title: "Experience"},
-    {url: "/contact", title: "Contact"},
+    {url: "/ZVL_IDS_Lab4/projects", title: "Projects"},
+    {url: "/ZVL_IDS_Lab4/experience", title: "Experience"},
+    {url: "/ZVL_IDS_Lab4/contact", title: "Contact"},
 ];
 
 let nav = document.createElement("nav");
