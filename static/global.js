@@ -32,10 +32,10 @@ function $$ (selector, context = document) {
 ]; */
 
 let pages = [
-    {url: ".", title: "Home"},
-    {url: "projects", title: "Projects"},
-    {url: "experience", title: "Experience"},
-    {url: "contact", title: "Contact"},
+    {url: "./", title: "Home"},
+    {url: "/projects", title: "Projects"},
+    {url: "/experience", title: "Experience"},
+    {url: "/contact", title: "Contact"},
 ];
 
 let nav = document.createElement("nav");
