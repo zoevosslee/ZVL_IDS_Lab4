@@ -147,6 +147,49 @@ html.dark {
   text-align: left;
 }
 
+.github-stats h2{
+  width: 100%;
+  margin: auto;
+  padding-bottom: 30px;
+  text-align: left;
+  padding-left: 5%; /* Ensuring alignment with .text-content */
+
+}
+.github-stats {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;  /* Match .container */
+  margin: auto;    /* Center alignment */
+  padding: 20px 0;
+  text-align: center;
+}
+
+/* Grid layout for <dl> */
+.github-stats dl {
+  max-width: 90%;  /* Match .container */
+  margin: auto;    /* Center alignment */
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; /* Four equal columns */
+  text-align: left;
+  gap: 10px;
+}
+
+/* Place <dt> on row 1 and <dd> on row 2 */
+.github-stats dt {
+  font-weight: bold;
+  grid-row: 1;
+}
+
+.github-stats dd {
+  grid-row: 2;
+  font-size: 1.2em;
+  color: var(--color-accent);
+  margin: 0;
+}
+
 
 /* General Styles */
 body {
@@ -160,75 +203,10 @@ body {
   flex-direction: column;
 }
 
-/* Navigation */
-nav {
-  --border-color: var(--color-border);
-  border-bottom: 1px solid var(--border-color);
-  padding: 10px 0;
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-}
-
-nav a {
-  color: var(--color-text);
-  text-decoration: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: var(--font-size-subtitle);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-nav a.current {
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-nav a:hover {
-  background-color: color-mix(in oklch, var(--color-accent), canvas 85%);
-}
-
-/* Dropdown Theme Switcher (Top-Left) */
-.color-scheme {
-  position: absolute;
-  top: 10px;
-  left: 10px;  /* Fixes position to top-left */
-  font-size: var(--font-size-subtitle);
-}
-
-.color-scheme select {
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: var(--font-size-base);
-  background-color: var(--color-primary);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-}
 
   img {
     max-width: 100%;
     height: auto;
-  }
-  
-  /*Nav Bar*/
-  nav {
-    display: flex;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-  }
-  
-  nav a {
-    flex: 1;
-    color: var(--color-text);
-    margin: 0 10px;
-    text-decoration: none;
-    font-size: var(--font-size-subtitle);
-  }
-  
-  nav a:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--color-accent);
   }
   
   

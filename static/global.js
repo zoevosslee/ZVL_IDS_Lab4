@@ -31,12 +31,12 @@ function $$ (selector, context = document) {
     {url: "contact", title: "Contact"},
 ]; */
 
-let pages = [
+/* let pages = [
     {url: "./", title: "Home"},
     {url: "\projects", title: "Projects"},
     {url: "\experience", title: "Experience"},
     {url: "\contact", title: "Contact"},
-];
+];*/
 
 let nav = document.createElement("nav");
 document.body.prepend(nav);
@@ -94,23 +94,23 @@ for (let p of pages) {
 // step 4.1
 // TODO: Inside your styles.css file, adjust your navigation menu colors! There is nothing to do in this file in this step.
 
-// step 4.2
-document.body.insertAdjacentHTML("afterbegin", `
-	<label class="color-scheme">
+/* // step 4.2
+/* document.body.insertAdjacentHTML("afterbegin", `
+/* 	<label class="color-scheme">
 		Theme:
 		<select>
 			<option value="auto">Automatic</option>
 			<option value="light">Light</option>
 			<option value="dark">Dark</option>
 		</select>
-	</label>`
-);
+	</label>` 
+); */
 
 
 // step 4.3
 // TODO: Inside your styles.css file, add styling to move the switcher with class .color-scheme to the top right corner. There is nothing to do in this file in this step
 
-// STEP 4.4: Theme Switcher
+/* // STEP 4.4: Theme Switcher
 
 // Select the theme dropdown
 let select = document.querySelector(".color-scheme select");
@@ -131,7 +131,7 @@ applyTheme(savedTheme);
 select.addEventListener("input", (event) => {
     console.log("Color scheme changed to:", event.target.value);
     applyTheme(event.target.value);
-});
+}); */
 // STEP 5 (OPTIONAL)
 // Note: This is an optional part of the lab! If you want to do it, uncomment the lines below and fill in the TODOs. Otherwise, leave the lines commented out.
 
