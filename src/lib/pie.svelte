@@ -10,17 +10,32 @@ let arc = arcGenerator({
 
 export let data = [];
 let sliceGenerator = d3.pie().value(d=> d.value);
-let arcData = sliceGenerator(data);
-let arcs = arcData.map(d => arcGenerator(d));
+
 let colors = d3.scaleOrdinal(d3.schemeTableau10);
+// Define arcData and arcs outside the reactive block
+let arcData;
+let arcs;
+
+    $: {
+		// Reactively calculate arcData and arcs the same way we did before with sliceGenerator and arcGenerator
+		arcData = sliceGenerator(data);
+		arcs = arcData.map(d => arcGenerator(d));
+    }
+
+    export let selectedIndex = -1;
+
 
 </script>
 
 <div class="container">
 <svg viewBox="-50 -50 100 100">
-    {#each arcs as arc, index}
-    <path d={ arc } fill={ colors(index) } />
-  {/each}
+{#each arcs as arc, index}
+	<path d={arc} fill={ colors(index) }
+	      class:selected={selectedIndex === index}
+	      on:click={e => selectedIndex = index} />
+{/each}
+
+
 </svg>
 
 <ul class="legend">
@@ -68,5 +83,43 @@ svg {
     font-size: 0.9em;
     margin-bottom: 0.3em;
 }
+
+svg:has(path:hover) path:not(:hover) {
+	opacity: 50%;
+}
+
+path {
+	transition: 300ms;
+}
+
+/* When a path is selected, make all non-selected paths 50% opacity */
+svg:has(.selected) path:not(.selected) {
+   opacity: 50%;
+}
+
+.selected {
+	--color: oklch(60% 45% 0) !important;
+	
+	&:is(path) {
+		fill: var(--color) !important;
+	}
+	
+	&:is(li) {
+		color: var(--color);
+	}
+}
+
+ul:has(.selected) li:not(.selected) {
+	color: gray;
+}
+
+path:hover {
+	opacity: 100% !important;
+}
+path {
+	/* ... */
+	cursor: pointer;
+}
+
 
 </style>
