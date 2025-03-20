@@ -1,31 +1,31 @@
 [
     {
-      "title": "Lorem ipsum dolor sit.",
+      "title": "POLLEN: Co-Designed Card Game + Web Wireframe",
+      "year": "2025",
+      "image": "static/images/pollen.png",
+      "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolor quos, quod assumenda explicabo odio, nobis ipsa laudantium quas eum veritatis ullam sint porro minima modi molestias doloribus cumque odit."
+    },
+    {
+      "title": "Paths to Power: A Prototype for Crowdsourcing Black Women's Activist Histories in Brooklyn",
       "year": "2024",
       "image": "https://vis-society.github.io/labs/2/images/empty.svg",
       "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolor quos, quod assumenda explicabo odio, nobis ipsa laudantium quas eum veritatis ullam sint porro minima modi molestias doloribus cumque odit."
     },
     {
-      "title": "Lorem ipsum dolor sit.",
+      "title": "Exploratory Data Analysis: Corporate Home Ownership in Boston",
+      "year": "2025",
+      "image": ,
+      "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolor quos, quod assumenda explicabo odio, nobis ipsa laudantium quas eum veritatis ullam sint porro minima modi molestias doloribus cumque odit."
+    },
+    {
+      "title": "Environmental Justice NYC Mapping Tool",
       "year": "2024",
-      "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+      "image": ,
       "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolor quos, quod assumenda explicabo odio, nobis ipsa laudantium quas eum veritatis ullam sint porro minima modi molestias doloribus cumque odit."
     },
     {
       "title": "Lorem ipsum dolor sit.",
-      "year": "2024",
-      "image": "https://vis-society.github.io/labs/2/images/empty.svg",
-      "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolor quos, quod assumenda explicabo odio, nobis ipsa laudantium quas eum veritatis ullam sint porro minima modi molestias doloribus cumque odit."
-    },
-    {
-      "title": "Lorem ipsum dolor sit.",
-      "year": "2024",
-      "image": "https://vis-society.github.io/labs/2/images/empty.svg",
-      "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolor quos, quod assumenda explicabo odio, nobis ipsa laudantium quas eum veritatis ullam sint porro minima modi molestias doloribus cumque odit."
-    },
-    {
-      "title": "Lorem ipsum dolor sit.",
-      "year": "2024",
+      "year": "2023",
       "image": "https://vis-society.github.io/labs/2/images/empty.svg",
       "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolor quos, quod assumenda explicabo odio, nobis ipsa laudantium quas eum veritatis ullam sint porro minima modi molestias doloribus cumque odit."
     },
