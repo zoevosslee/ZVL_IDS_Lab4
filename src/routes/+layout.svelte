@@ -9,6 +9,7 @@ let pages = [
   { url: "./projects", title: "Projects" },
   { url: "./experience", title: "Experience" },
   { url: "./contact", title: "Contact" },
+  { url: "./meta", title: "Meta"},
   // add the rest of your pages here
 ];
 

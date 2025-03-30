@@ -149,8 +149,6 @@ html.dark {
 
 .github-stats h2{
   width: 100%;
-  margin: auto;
-  padding-bottom: 30px;
   text-align: left;
   padding-left: 5%; /* Ensuring alignment with .text-content */
 
@@ -159,11 +157,9 @@ html.dark {
   background-color: var(--color-background);
   color: var(--color-text);
   border: 1px solid var(--color-border);
-  padding: 20px;
   border-radius: 8px;
   max-width: 90%;  /* Match .container */
   margin: auto;    /* Center alignment */
-  padding: 20px 0;
   text-align: center;
 }
 
@@ -172,9 +168,9 @@ html.dark {
   max-width: 90%;  /* Match .container */
   margin: auto;    /* Center alignment */
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr; /* Four equal columns */
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));; /* Four equal columns */
   text-align: left;
-  gap: 10px;
+  gap: 30px;
 }
 
 /* Place <dt> on row 1 and <dd> on row 2 */
