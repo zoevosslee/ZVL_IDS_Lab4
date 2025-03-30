@@ -1,6 +1,9 @@
 <script>
     import * as d3 from "d3";
     import { onMount } from "svelte";
+    import { tick } from "svelte";
+    import { computePosition, offset, autoPlacement } from '@floating-ui/dom';
+    import Bar from '$lib/bar.svelte';
     let width = 1000, height = 600;
     let margin = {top: 10, right: 10, bottom: 30, left: 20};
     let usableArea = {
@@ -14,15 +17,58 @@ usableArea.height = usableArea.bottom - usableArea.top;
 
 let xAxis, yAxis, yAxisGridlines;
 let hoveredIndex = -1;
-$: hoveredCommit = commits[hoveredIndex] ?? hoveredCommit ?? {};
+let commitTooltip;
+let tooltipPosition = {x: 0, y: 0};
+let clickedCommits = [];
 
 
-    let data = [];
-    let commits = [];
+async function dotInteraction(index, evt) {
+  if (evt.type === "mouseenter") {
+    hoveredIndex = index;
+
+    // Wait for tooltip to render
+    await tick();
+
+    let hoveredDot = evt.target;
+
+    if (hoveredDot && commitTooltip) {
+      const { x, y } = await computePosition(hoveredDot, commitTooltip, {
+        strategy: "fixed",
+        middleware: [offset(5), autoPlacement()]
+      });
+      tooltipPosition = { x, y };
+    }
+  } else if (evt.type === "mouseleave") {
+    hoveredIndex = -1;
+  }
+  else if (evt.type === "click") {
+	let commit = commits[index]
+	if (!clickedCommits.includes(commit)) {
+		// Add the commit to the clickedCommits array
+		clickedCommits = [...clickedCommits, commit];
+	}
+	else {
+			// Remove the commit from the array
+			clickedCommits = clickedCommits.filter(c => c !== commit);
+	}
+    console.log(clickedCommits);
+}
+}
+
+$: hoveredCommit = hoveredIndex !== -1 ? commits[hoveredIndex] : null;
+
+let data = [];
+let commits = [];
+$: rScale = d3.scaleSqrt()
+  .domain(d3.extent(commits, d => d.totalLines))
+  .range([3, 12]); // min & max radius
+
+
+
   
-    onMount(async () => {
-      data = await d3.csv("/loc.csv", row => ({
-        ...row,
+onMount(async () => {
+    data = await d3.csv("/loc.csv", row => ({
+    ...row,
         line: Number(row.line),
         depth: Number(row.depth),
         length: Number(row.length),
@@ -33,7 +79,8 @@ $: hoveredCommit = commits[hoveredIndex] ?? hoveredCommit ?? {};
       commits = d3.groups(data, d => d.commit).map(([commit, lines]) => {
         let first = lines[0];
         let { author, date, time, timezone, datetime } = first;
-  
+    commits = d3.sort(commits, d => -d.totalLines);
+
         let ret = {
           id: commit,
           url: "https://github.com/vis-society/lab-7/commit/" + commit,
@@ -89,88 +136,102 @@ $: yScale = d3.scaleLinear()
 }
 
 $: colorScale = d3.scaleSequential(d3.interpolateWarm).domain([24, 0]);
-// or try interpolateCool, interpolatePlasma, interpolateTurbo, etc.
+
+$: allTypes = Array.from(new Set(data.map(d => d.type)));
+$: selectedLines = (clickedCommits.length > 0 ? clickedCommits : commits).flatMap(d => d.lines);
+$: selectedCounts = d3.rollup(
+    selectedLines,
+    v => v.length,
+    d => d.type
+);
+$: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0]);
 
 
 
 
   </script>
   
-<body>
-<section class="meta-stats">
-    <h2>My Metadata</h2>
-    <dl>
+  <body>
+    <section class="meta-stats">
+      <h2>My Metadata</h2>
+      <dl>
         <dt>Total <abbr title="Lines of code">LOC</abbr></dt>
         <dd>{data.length}</dd>
         <dt>Commits</dt>
         <dd>{commits.length}</dd>
-    
         <dt>Files</dt>
         <dd>{[...new Set(data.map(d => d.filename))].length}</dd>
-    
         <dt>Longest Line</dt>
         <dd>{d3.max(data, d => d.length)}</dd>
-
         <dt>Average Line Length</dt>
         <dd>{d3.mean(data, d => d.length)?.toFixed(2)}</dd>
-
         <dt>Days Worked</dt>
         <dd>{[...new Set(data.map(d => d.date.toDateString()))].length}</dd>
         <dt>Most Active Time of Day</dt>
         <dd>{d3.greatest(
-              d3.rollups(data, v => v.length, d => d.datetime.toLocaleString("en", { dayPeriod: "short" })),
-              d => d[1]
-            )?.[0]}</dd>
-
-    <dt>Most Active Day of Week</dt>
-    <dd>{d3.greatest(
-      d3.rollups(data, v => v.length, d => d.date.toLocaleString("en", { weekday: "long" })),
-      d => d[1]
-    )?.[0]}</dd>
-    </dl>
-</section>
-
-<section>
-    <h2>Commits by Time of Day</h2>
-<svg viewBox="0 0 {width} {height}">
-    <g class="gridlines" transform="translate({usableArea.left}, 0)" bind:this={yAxisGridlines} />
-    <g transform="translate(0, {usableArea.bottom})" bind:this={xAxis} />
-    <g transform="translate({usableArea.left}, 0)" bind:this={yAxis} />
-    <g class="dots">
-        {#each commits as commit, index }
-            <circle
-                on:mouseenter={evt => hoveredIndex = index}
-                on:mouseleave={evt => hoveredIndex = -1}
-                
-                cx={ xScale(commit.datetime) }
-                cy={ yScale(commit.hourFrac) }
-                r="5"
-                fill="steelblue"
-            />
-        {/each}
-        </g>
-    </svg>
-
-    <dl class="info tooltip">
-        <dt>Commit</dt>
-        <dd><a href="{hoveredCommit.url}" target="_blank">{hoveredCommit.id}</a></dd>
-      
-        <dt>Date</dt>
-        <dd>{hoveredCommit.datetime?.toLocaleString("en", { dateStyle: "full" })}</dd>
-      
-        <dt>Time</dt>
-        <dd>{hoveredCommit.datetime?.toLocaleTimeString("en", { hour: "numeric", minute: "2-digit" })}</dd>
-      
-        <dt>Author</dt>
-        <dd>{hoveredCommit.author}</dd>
-      
-        <dt>Lines Edited</dt>
-        <dd>{hoveredCommit.totalLines}</dd>
+          d3.rollups(data, v => v.length, d => d.datetime.toLocaleString("en", { dayPeriod: "short" })),
+          d => d[1]
+        )?.[0]}</dd>
+        <dt>Most Active Day of Week</dt>
+        <dd>{d3.greatest(
+          d3.rollups(data, v => v.length, d => d.date.toLocaleString("en", { weekday: "long" })),
+          d => d[1]
+        )?.[0]}</dd>
       </dl>
-      
-</section>
-
-</body>
+    </section>
+  
+    <section class="visualization-section">
+      <h2>Commits by Time of Day</h2>
+  
+      <div class="chart-container" style="position: relative;">
+        <svg viewBox="0 0 {width} {height}">
+          <g class="gridlines" transform="translate({usableArea.left}, 0)" bind:this={yAxisGridlines} />
+          <g transform="translate(0, {usableArea.bottom})" bind:this={xAxis} />
+          <g transform="translate({usableArea.left}, 0)" bind:this={yAxis} />
+          <g class="dots">
+            {#each commits as commit, index}
+              <circle
+                on:click={evt => dotInteraction(index, evt)}
+                class:selected={clickedCommits.includes(commit)}
+                on:mouseenter={evt => dotInteraction(index, evt)}
+                on:mouseleave={evt => dotInteraction(index, evt)}
+                cx={xScale(commit.datetime)}
+                cy={yScale(commit.hourFrac)}
+                r={rScale(commit.totalLines)}
+                fill-opacity={0.8}
+                fill="steelblue"
+              />
+            {/each}
+          </g>
+        </svg>
+  
+        {#if hoveredCommit}
+          <dl
+            class="info tooltip"
+            bind:this={commitTooltip}
+            style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px;"
+            hidden={hoveredIndex === -1}
+          >
+            <dt>Commit</dt>
+            <dd><a href="{hoveredCommit.url}" target="_blank">{hoveredCommit.id}</a></dd>
+            <dt>Date</dt>
+            <dd>{hoveredCommit.datetime?.toLocaleString("en", { dateStyle: "full" })}</dd>
+            <dt>Time</dt>
+            <dd>{hoveredCommit.datetime?.toLocaleTimeString("en", { hour: "numeric", minute: "2-digit" })}</dd>
+            <dt>Author</dt>
+            <dd>{hoveredCommit.author}</dd>
+            <dt>Lines Edited</dt>
+            <dd>{hoveredCommit.totalLines}</dd>
+          </dl>
+        {/if}
+      </div>
+  
+      <div class="bar-chart-container">
+        <Bar data={languageBreakdown} width={width} />
+      </div>
+    </section>
+  </body>
+  
 <style>
     body {padding:50px;}
 	svg {
@@ -225,6 +286,61 @@ $: colorScale = d3.scaleSequential(d3.interpolateWarm).domain([24, 0]);
 	stroke-opacity: .2;
 }
 
+.tooltip {
+    position: fixed;
+    background: var(--color-primary, white);
+    color: var(--color-text, black);
+    border: 1px solid var(--color-border, lightgray);
+    border-radius: 8px;
+    padding: 1em;
+    font-size: 0.85em;
+    z-index: 10;
+    max-width: 300px;
+    transition-duration: 500ms;
+    transition-property: opacity, visibility;
+    box-shadow: 0 2px 4px white;
+  }
+
+
+  dl.info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  margin: 0;
+  padding: 1em;
+  font-size: 0.9em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+dl.info dt {
+    font-weight: bold;
+    padding-bottom: 10px;
+
+}
+
+dl.info dd {
+font-size: 1.2em;
+  color: var(--color-accent);
+  margin: 0;
+
+}
+
+circle {
+	
+    transform-origin: center;
+transform-box: fill-box;
+    transition: 200ms;
+
+	&:hover {
+		transform: scale(1.5);
+	}
+}
+
+.selected {
+    fill: var(--color-accent);
+}
 
 
 
