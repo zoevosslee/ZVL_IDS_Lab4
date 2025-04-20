@@ -24,13 +24,10 @@
     const match = groupedLines.find(([name]) => name === file.name);
     return {
       ...file,
-      totalLines: file.lines.length,
       visibleLines: match ? match[1] : []
     };
   })
-  .sort((a, b) => b.totalLines - a.totalLines); // ✅ now you're sorting the array of file objects
-
-
+  .sort((a, b) => b.visibleLines.length - a.visibleLines.length); // ← sort by visible lines!
 
   // Fixed height based on original line count (for stability)
   $: filesWithHeights = files.map(file => {
@@ -50,7 +47,7 @@
     return pos;
   })();
 
-  function generateDots(file, svgWidth) {
+function generateDots(file, svgWidth) {
   const totalDots = Math.ceil(file.visibleLines.length / linesPerDot);
   const availableWidth = svgWidth - dotsColumnX;
   const maxDotsPerRow = Math.floor(availableWidth / approxDotWidth) || totalDots;
@@ -87,42 +84,44 @@
       .attr("height", totalHeight)
       .style("overflow", "hidden");
 
-    const groups = d3.select(svg)
-      .selectAll("g.file")
-      .data(filesWithHeights, d => d.name);
 
-    groups.exit().remove();
+const groups = d3.select(svg)
+  .selectAll("g.file")
+  .data(filesWithHeights, d => d.name);
 
-    const enterGroups = groups.enter()
-      .append("g")
-      .attr("class", "file")
-      .attr("transform", (d, i) => `translate(0, ${positions[i]})`);
+groups.exit().remove();
 
-    enterGroups.append("text")
-      .attr("class", "filename")
-      .attr("x", 10)
-      .attr("y", fileInfoHeight)
-      .text(d => d.name);
+const enterGroups = groups.enter()
+  .append("g")
+  .attr("class", "file")
+  .attr("transform", (d, i) => `translate(0, ${positions[i]})`);
 
-    enterGroups.append("text")
-      .attr("class", "linecount")
-      .attr("y", fileInfoHeight + 16)
-      .text(d => `${d.totalLines} lines`);
+enterGroups.append("text")
+  .attr("class", "filename")
+  .attr("x", 10)
+  .attr("y", fileInfoHeight)
+  .text(d => d.name);
 
-    enterGroups.append("text")
-      .attr("class", "unit-dots")
-      .attr("x", dotsColumnX)
-      .attr("y", fileInfoHeight - 2)
-      .attr("dominant-baseline", "mathematical")
-      .attr("fill", "#1f77b4")
-      .html(d => generateDots(d, svgWidth));
+enterGroups.append("text")
+  .attr("class", "linecount")
+  .attr("y", fileInfoHeight + 16)
+  .text(d => `${d.totalLines} lines`);
 
-      groups
+enterGroups.append("text")
+  .attr("class", "unit-dots")
+  .attr("x", dotsColumnX)
+  .attr("y", fileInfoHeight - 2)
+  .attr("dominant-baseline", "mathematical")
+  .attr("fill", "#1f77b4")
+  .html(d => generateDots(d, svgWidth));
+
+// ✅ Now safe to use groups below
+groups
   .transition()
   .duration(3000)
   .attr("transform", (d, i) => `translate(0, ${positions[i]})`);
 
-    groups.each(function (d) {
+groups.each(function (d) {
   const groupSel = d3.select(this);
   const unitDotsSel = groupSel.select('text.unit-dots');
   const newCount = d.visibleLines.length;
@@ -144,10 +143,11 @@
   }
 
   previousDotCounts.set(d.name, newCount);
-    });
-  } // ← this is what was missing
-</script>
+});
 
+
+  }
+</script>
 
 
 <svg bind:this={svg}></svg>

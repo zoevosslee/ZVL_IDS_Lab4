@@ -231,7 +231,7 @@ $: allFiles = d3.groups(data, d => d.file)
       </div>
 
       {#if selectedLines.length > 0}
-      <FileLines lines={filteredLines} allFiles={allFiles} width={width} colorScale={colorScale} />
+<FileLines lines={filteredLines} allFiles={allFiles} width={width} colorScale={colorScale} />
       {/if}
       
       <time>{commitMaxTime.toLocaleString("en", { dateStyle: "long", timeStyle: "short" })}</time>
