@@ -4,6 +4,7 @@
     import { tick } from "svelte";
     import { computePosition, offset, autoPlacement } from '@floating-ui/dom';
     import Bar from '$lib/bar.svelte';
+    import FileLines from '$lib/FileLines.svelte';
     let width = 1000, height = 600;
     let margin = {top: 10, right: 10, bottom: 30, left: 20};
     let usableArea = {
@@ -20,6 +21,16 @@ let hoveredIndex = -1;
 let commitTooltip;
 let tooltipPosition = {x: 0, y: 0};
 let clickedCommits = [];
+
+let commitProgress = 100;
+
+const linesPerDot = 5;
+const dotsColumnX = 300;
+const approxDotWidth = 10;
+const fileInfoHeight = 20;
+const dotRowHeight = 24;
+
+
 
 
 async function dotInteraction(index, evt) {
@@ -63,6 +74,7 @@ $: rScale = d3.scaleSqrt()
   .domain(d3.extent(commits, d => d.totalLines))
   .range([3, 12]); // min & max radius
 
+  
 
 
   
@@ -100,19 +112,31 @@ onMount(async () => {
       });
     });
 
-    $: minDate = d3.min(commits.map(d => d.date));
+$: minDate = d3.min(commits.map(d => d.date));
 $: maxDate = d3.max(commits.map(d => d.date));
 $: maxDatePlusOne = new Date(maxDate);
 $: maxDatePlusOne.setDate(maxDatePlusOne.getDate() + 1);
 
+$: timeScale = d3.scaleTime()
+  .domain([minDate, maxDatePlusOne])
+  .range([0, 100]);
+
+$: commitMaxTime = timeScale.invert(commitProgress);
+
+$: filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+
 $: xScale = d3.scaleTime()
-              .domain([minDate, maxDatePlusOne])
-              .range([usableArea.left, usableArea.right])
-              .nice();
+  .domain([minDate, commitMaxTime])
+  .range([usableArea.left, usableArea.right])
+  .nice();
+
 
 $: yScale = d3.scaleLinear()
               .domain([24, 0])
               .range([usableArea.bottom, usableArea.top]);
+
+
+
 
               $: {
   d3.select(xAxis).call(d3.axisBottom(xScale));
@@ -128,6 +152,7 @@ $: yScale = d3.scaleLinear()
       .tickSize(-usableArea.width)
   );
 
+
   // 🎨 Color each horizontal gridline by time of day
   d3.select(yAxisGridlines)
     .selectAll(".tick line")
@@ -138,7 +163,8 @@ $: yScale = d3.scaleLinear()
 $: colorScale = d3.scaleSequential(d3.interpolateWarm).domain([24, 0]);
 
 $: allTypes = Array.from(new Set(data.map(d => d.type)));
-$: selectedLines = (clickedCommits.length > 0 ? clickedCommits : commits).flatMap(d => d.lines);
+$: base = clickedCommits.length > 0 ? clickedCommits : filteredCommits;
+$: selectedLines = base.flatMap(d => d.lines);
 $: selectedCounts = d3.rollup(
     selectedLines,
     v => v.length,
@@ -146,6 +172,14 @@ $: selectedCounts = d3.rollup(
 );
 $: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0]);
 
+// Lines from only filtered commits (for meta stats)
+$: filteredLines = filteredCommits.flatMap(d => d.lines);
+$: allFiles = d3.groups(data, d => d.file)
+  .map(([name, lines]) => ({
+    name,
+    lines,
+    totalLines: lines.length
+  }));
 
 
 
@@ -156,15 +190,15 @@ $: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0
       <h2>My Metadata</h2>
       <dl>
         <dt>Total <abbr title="Lines of code">LOC</abbr></dt>
-        <dd>{data.length}</dd>
+        <dd>{filteredLines.length}</dd> <!-- Total LOC -->
         <dt>Commits</dt>
-        <dd>{commits.length}</dd>
+        <dd>{filteredCommits.length}</dd>
         <dt>Files</dt>
-        <dd>{[...new Set(data.map(d => d.filename))].length}</dd>
+        <dd>{[...new Set(filteredLines.map(d => d.filename))].length}</dd>
         <dt>Longest Line</dt>
-        <dd>{d3.max(data, d => d.length)}</dd>
+        <dd>{d3.max(filteredLines, d => d.length)}</dd>
         <dt>Average Line Length</dt>
-        <dd>{d3.mean(data, d => d.length)?.toFixed(2)}</dd>
+        <dd>{d3.mean(filteredLines, d => d.length)?.toFixed(2)}</dd>
         <dt>Days Worked</dt>
         <dd>{[...new Set(data.map(d => d.date.toDateString()))].length}</dd>
         <dt>Most Active Time of Day</dt>
@@ -182,6 +216,27 @@ $: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0
   
     <section class="visualization-section">
       <h2>Commits by Time of Day</h2>
+
+      <div class="slider-container">
+        <div class="slider-row">
+          <label for="time-slider">Show commits until:</label>
+          <input
+            type="range"
+            id="time-slider"
+            class="slider"
+            min="0"
+            max="100"
+            bind:value={commitProgress}
+          />
+        </div>
+
+        {#if selectedLines.length > 0}
+        <FileLines lines={filteredLines} allFiles={allFiles} width={width} />
+        {/if}
+        
+        <time>{commitMaxTime.toLocaleString("en", { dateStyle: "long", timeStyle: "short" })}</time>
+      </div>
+      
   
       <div class="chart-container" style="position: relative;">
         <svg viewBox="0 0 {width} {height}">
@@ -189,8 +244,8 @@ $: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0
           <g transform="translate(0, {usableArea.bottom})" bind:this={xAxis} />
           <g transform="translate({usableArea.left}, 0)" bind:this={yAxis} />
           <g class="dots">
-            {#each commits as commit, index}
-              <circle
+            {#each filteredCommits as commit (commit.id)}
+            <circle
                 on:click={evt => dotInteraction(index, evt)}
                 class:selected={clickedCommits.includes(commit)}
                 on:mouseenter={evt => dotInteraction(index, evt)}
@@ -225,10 +280,11 @@ $: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0
           </dl>
         {/if}
       </div>
-  
+
       <div class="bar-chart-container">
         <Bar data={languageBreakdown} width={width} />
       </div>
+      
     </section>
   </body>
   
@@ -273,7 +329,7 @@ $: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0
 
 .meta-stats dd {
   font-size: 1.2em;
-  color: var(--color-accent);
+  color: white;
   margin: 0;
 }
 
@@ -329,6 +385,11 @@ font-size: 1.2em;
 
 circle {
 	
+  @starting-style {
+	r: 0;
+}
+
+
     transform-origin: center;
 transform-box: fill-box;
     transition: 200ms;
@@ -340,6 +401,86 @@ transform-box: fill-box;
 
 .selected {
     fill: var(--color-accent);
+}
+
+/* Container for the entire slider + date display */
+.slider-container {
+  display: grid;
+  grid-template-rows: auto auto;
+  max-width: 600px;
+  margin: 1.5rem 0 2rem;
+  text-align:left;
+  gap: 0.5rem;
+  padding: 0 0rem;
+  font-family: inherit;
+}
+
+/* Row with label and slider */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  white-space: nowrap;
+  width: 50%;
+}
+
+/* Style the label */
+.slider-row label {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Style the slider itself */
+.slider {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  outline: none;
+}
+
+.slider:hover {
+  background: #bbb;
+}
+
+/* Customize the slider thumb */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: steelblue;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: steelblue;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Date/time display */
+.slider-container time {
+  font-size: 0.95rem;
+  color: white;
+  text-align: right;
+}
+/* Style for FileLines labels */
+:global(text.filename),
+:global(text.linecount) {
+  fill: white;
+  font-size: 12px;
 }
 
 
