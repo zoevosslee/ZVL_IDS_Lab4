@@ -251,19 +251,20 @@ $: allFiles = d3.groups(data, d => d.file)
         <g transform="translate(0, {usableArea.bottom})" bind:this={xAxis} />
         <g transform="translate({usableArea.left}, 0)" bind:this={yAxis} />
         <g class="dots">
-          {#each filteredCommits as commit (commit.id)}
+          {#each filteredCommits as commit, index (commit.id)}
           <circle
-              on:click={evt => dotInteraction(index, evt)}
-              class:selected={clickedCommits.includes(commit)}
-              on:mouseenter={evt => dotInteraction(index, evt)}
-              on:mouseleave={evt => dotInteraction(index, evt)}
-              cx={xScale(commit.datetime)}
-              cy={yScale(commit.hourFrac)}
-              r={rScale(commit.totalLines)}
-              fill-opacity={0.8}
-              fill="steelblue"
-            />
-          {/each}
+            on:click={evt => dotInteraction(index, evt)}
+            class:selected={clickedCommits.includes(commit)}
+            on:mouseenter={evt => dotInteraction(index, evt)}
+            on:mouseleave={evt => dotInteraction(index, evt)}
+            cx={xScale(commit.datetime)}
+            cy={yScale(commit.hourFrac)}
+            r={rScale(commit.totalLines)}
+            fill-opacity={0.8}
+            fill="steelblue"
+          />
+        {/each}
+        
         </g>
       </svg>
 
@@ -289,8 +290,16 @@ $: allFiles = d3.groups(data, d => d.file)
     </div>
 
     <div class="bar-chart-container">
-      <StackedBar data={languageBreakdown} width={width} colorScale={colorScale} />
-    </div>
+      <StackedBar
+      data={d3.rollups(
+        selectedLines,
+        v => v.length,
+        d => d.type
+      )}
+      width={width}
+      colorScale={colorScale}
+    />
+        </div>
     
   </section>
 </body>
