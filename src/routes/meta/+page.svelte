@@ -5,6 +5,7 @@
   import { computePosition, offset, autoPlacement } from '@floating-ui/dom';
   import Bar from '$lib/bar.svelte';
   import FileLines from '$lib/FileLines.svelte';
+  import StackedBar from '$lib/StackedBar.svelte';
   let width = 1000, height = 600;
   let margin = {top: 10, right: 10, bottom: 30, left: 20};
   let usableArea = {
@@ -15,6 +16,10 @@ left: margin.left
 };
 usableArea.width = usableArea.right - usableArea.left;
 usableArea.height = usableArea.bottom - usableArea.top;
+
+export let languageBreakdown;
+  export let colorScale;
+
 
 let xAxis, yAxis, yAxisGridlines;
 let hoveredIndex = -1;
@@ -160,17 +165,18 @@ d3.select(yAxisGridlines)
   .attr("stroke-opacity", 0.5);
 }
 
-$: colorScale = d3.scaleSequential(d3.interpolateWarm).domain([24, 0]);
+$: colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(allTypes);
 
-$: allTypes = Array.from(new Set(data.map(d => d.type)));
 $: base = clickedCommits.length > 0 ? clickedCommits : filteredCommits;
 $: selectedLines = base.flatMap(d => d.lines);
+$: allTypes = Array.from(new Set(selectedLines.map(d => d.type)));
 $: selectedCounts = d3.rollup(
   selectedLines,
   v => v.length,
   d => d.type
 );
 $: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0]);
+
 
 // Lines from only filtered commits (for meta stats)
 $: filteredLines = filteredCommits.flatMap(d => d.lines);
@@ -213,6 +219,7 @@ $: allFiles = d3.groups(data, d => d.file)
       )?.[0]}</dd>
     </dl>
   </section>
+
 
   <section class="visualization-section">
     <h2>Commits by Time of Day</h2>
@@ -282,7 +289,7 @@ $: allFiles = d3.groups(data, d => d.file)
     </div>
 
     <div class="bar-chart-container">
-      <Bar data={languageBreakdown} width={width} />
+      <StackedBar data={languageBreakdown} width={width} colorScale={colorScale} />
     </div>
     
   </section>

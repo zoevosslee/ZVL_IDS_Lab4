@@ -118,7 +118,14 @@ enterGroups.append("text")
 // ✅ Now safe to use groups below
 groups
   .transition()
-  .duration(3000)
+  .duration(function(d, i) {
+    const currentTransform = this.getAttribute("transform") || "translate(0,0)";
+    const match = currentTransform.match(/translate\(\s*0\s*,\s*([0-9.]+)\s*\)/);
+    const oldY = match ? +match[1] : 0;
+    const newY = positions[i];
+    const distance = Math.abs(newY - oldY);
+    return distance * 2;
+  })
   .attr("transform", (d, i) => `translate(0, ${positions[i]})`);
 
 groups.each(function (d) {
